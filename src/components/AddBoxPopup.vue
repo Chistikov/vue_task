@@ -32,7 +32,7 @@ export default {
   methods: {
     addNewBox: function(){
       let newBox = new Box(this.width, this.height, this.depth, this.weight);
-      debugger;
+      
       if((parseInt(this.width) === 0 || this.width) && (parseInt(this.height) === 0 || this.height) && (parseInt(this.depth) === 0 || this.depth) && (parseInt(this.weight) === 0 ||this.weight)){
         this.$emit('saveNewBox', newBox);
       }
