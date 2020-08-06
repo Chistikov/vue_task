@@ -17,30 +17,23 @@
 </template>
 
 <script>
-export default {
-  props: {},
+import Box from '@/scripts/Box.js';
 
+export default {
   data: ()=>(
     {
-      width: undefined,
-      height: undefined,
-      depth: undefined,
-      weight: undefined,
+      width: null,
+      height: null,
+      depth: null,
+      weight: null,
     }
   ),
   
   methods: {
     addNewBox: function(){
-      function createBox(width, height, depth, weight) {
-        this.width = +width;
-        this.height = +height;
-        this.depth = +depth;
-        this.weight = +weight;
-      }
-
-      let newBox = new createBox(this.width, this.height, this.depth, this.weight);
-
-      if(this.width && this.height && this.depth && this.weight){
+      let newBox = new Box(this.width, this.height, this.depth, this.weight);
+      debugger;
+      if((parseInt(this.width) === 0 || this.width) && (parseInt(this.height) === 0 || this.height) && (parseInt(this.depth) === 0 || this.depth) && (parseInt(this.weight) === 0 ||this.weight)){
         this.$emit('saveNewBox', newBox);
       }
     },
@@ -52,7 +45,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="sass">
 body
   overflow: hidden
@@ -77,7 +69,6 @@ body
 
 .inputWrp
   display: flex
-  // width: 400px
 
   input
     display: block
@@ -100,7 +91,4 @@ body
 .add
   background: #42b983
   color: #fff
-
-
-
 </style>

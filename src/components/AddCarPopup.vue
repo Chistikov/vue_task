@@ -14,25 +14,20 @@
 </template>
 
 <script>
-export default {
-  props: {},
+import Car from '@/scripts/Car.js';
 
+export default {
   data: ()=>(
     {
-      maxWeight: undefined
+      maxWeight: null
     }
   ),
   
   methods: {
     addNewCar: function(){
-      function createCar(maxWeight) {
-        this.maxWeight = +maxWeight;
-      }
+      let newCar = new Car(this.maxWeight);
 
-      let newCar = new createCar(this.maxWeight);
-
-      if(this.maxWeight){
-        alert(newCar)
+      if(parseInt(this.maxWeight) === 0 || this.maxWeight){
         this.$emit('saveNewCar', newCar);
       }
     },
@@ -69,7 +64,6 @@ body
 
 .inputWrp
   display: flex
-  // width: 400px
 
   input
     display: block
@@ -92,7 +86,4 @@ body
 .add
   background: #42b983
   color: #fff
-
-
-
 </style>

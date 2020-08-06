@@ -1,46 +1,48 @@
 <template>
-<div>
-  <AddBoxPopup v-on:saveNewBox="addNewBox" v-on:hideAddNewBoxPopup="hideAddNewBoxPopup" v-if="addBoxPopupIsVisible"></AddBoxPopup>
-  <AddCarPopup v-on:saveNewCar="addNewCar" v-on:hideAddNewCarPopup="hideAddNewCarPopup" v-if="addCarPopupIsVisible"></AddCarPopup>
-  <div class="Logistic">
-    <div class="container">
-      <div class="taskLable">Task 1</div>
-      <div class="title">Boxes</div>
-      <div>{{ box1 }}</div>
-      <div>{{ box2 }}</div>
-      <div>{{ box3 }}</div>
-    </div>
+  <div>
+    <AddBoxPopup v-on:saveNewBox="addNewBox" v-on:hideAddNewBoxPopup="hideAddNewBoxPopup" v-if="addBoxPopupIsVisible"></AddBoxPopup>
+    <AddCarPopup v-on:saveNewCar="addNewCar" v-on:hideAddNewCarPopup="hideAddNewCarPopup" v-if="addCarPopupIsVisible"></AddCarPopup>
+    <div class="Logistic">
+      <div class="container">
+        <div class="taskLable">Task 1</div>
+        <div class="title">Boxes</div>
+        <div>{{ box1 }}</div>
+        <div>{{ box2 }}</div>
+        <div>{{ box3 }}</div>
+      </div>
 
-    <div class="container">
-      <div class="taskLable">Task 2</div>
-      <div class="title">
-        Boxes
-        <span class="addBtn" v-on:click="showAddBoxPopup()">+</span>
+      <div class="container">
+        <div class="taskLable">Task 2</div>
+        <div class="title">
+          Boxes
+          <span class="addBtn" v-on:click="showAddBoxPopup()">+</span>
+        </div>
+        <div v-for="(item, index) in boxArray" :key="index">
+          {{ item }}
+          <span class="removeBtn" v-on:click="removeBox(index)">-</span>
+        </div>
+        <div v-if="boxArray.length != 0">
+          <div class="title">Max height: {{ getMaxHeight }} kg</div>
+          <div class="title">Max width: {{ getMaxWidth }} kg</div>
+          <div class="title">Max depth: {{ getMaxDepth }} kg</div>
+        </div>
+        <div class="title" v-else>Box array is empty</div>
       </div>
-      <div v-for="(item, index) in boxArray" :key="index">
-        {{ item }}
-        <span class="removeBtn" v-on:click="removeBox(index)">-</span>
-      </div>
-      <div v-if="boxArray != 0">
-        <div class="title">Max height: {{ getMaxHeight }} kg</div>
-        <div class="title">Max width: {{ getMaxWidth }} kg</div>
-        <div class="title">Max depth: {{ getMaxDepth }} kg</div>
-      </div>
-      <div class="title" v-else>Box array is empty</div>
-    </div>
 
-    <div class="container">
-      <div class="taskLable">Task 3</div>
-      <div class="title">
-        Cars
-        <span class="addBtn" v-on:click="showAddCarPopup()">+</span>
-      </div>
-      <div v-for="(item, index) in carsArray" :key="index">{{ item }} <span class="removeBtn" v-on:click="removeCar(index)">-</span></div>
+      <div class="container">
+        <div class="taskLable">Task 3</div>
+        <div class="title">
+          Cars
+          <span class="addBtn" v-on:click="showAddCarPopup()">+</span>
+        </div>
+        <div v-for="(item, index) in carsArray" :key="index">{{ item }} <span class="removeBtn" v-on:click="removeCar(index)">-</span></div>
 
-      <div class="title">Total box weight: {{ calcTotalWeight }} kg</div>
-      <div class="title">Best car: {{ getSuitableCar }}</div>
+        <div class="title">Total box weight: {{ calcTotalWeight }} kg</div>
+        <div class="title" v-if="carsArray.length !== 0 && getSuitableCar">Best car: {{ getSuitableCar }}</div>
+        <div class="title" v-else-if="carsArray.length === 0">Car list is empty.</div>
+        <div class="title" v-else-if="carsArray.length !== 0 && getSuitableCar === null">Suitable car not found</div>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -48,34 +50,26 @@
 import AddBoxPopup from '@/components/AddBoxPopup.vue'
 import AddCarPopup from '@/components/AddCarPopup.vue'
 
+import Car from '@/scripts/Car.js';
+import Box from '@/scripts/Box.js';
+
 export default {
   name: "Logistic",
   components: { AddBoxPopup, AddCarPopup},
 
   data: () => {
     return {
-      box1: undefined,
-      box2: undefined,
-      box3: undefined,
+      box1: null,
+      box2: null,
+      box3: null,
       boxArray: [],
       carsArray: [],
       addBoxPopupIsVisible: false,
-      addCarPopupIsVisible: true
+      addCarPopupIsVisible: false
     };
   },
 
   methods: {
-    createBox: function(width, height, depth, weight) {
-      this.width = width;
-      this.height = height;
-      this.depth = depth;
-      this.weight = weight;
-    },
-
-    createCar: function(maxWeight) {
-      this.maxWeight = maxWeight;
-    },
-
     removeBox: function(index){
       this.boxArray.splice(index, 1);
     },
@@ -111,14 +105,10 @@ export default {
     },
 
     findItemWithExtremeValues: function(arr, prop, searchValue) {
-      if (arr.length === 0) return "array is empty";
-
       let extremeValue;
       let boxItems = [];
 
       arr.forEach((box) => {
-        if (box[prop] === undefined) return `Property ${prop} is undefined`;
-
         if (!extremeValue) {
           extremeValue = box[prop];
           boxItems = [box];
@@ -169,9 +159,7 @@ export default {
     },
 
     getSuitableCar: function() {
-      if (this.carsArray.length === 0) return "not found";
-
-      let suitableCar;
+      let suitableCar = null;
       let carsArrayClone = this.carsArray.slice();
       let sortedCarsArr = carsArrayClone.sort((a, b) => {
         if (a.maxWeight > b.maxWeight) {
@@ -190,35 +178,31 @@ export default {
         }
       }
 
-      if(suitableCar){
-        return suitableCar;
-      } else {
-        return "not found"
-      }
+      return suitableCar;
     }
   },
 
   created: function() {
-    this.box1 = new this.createBox(10, 20, 30, 10);
-    this.box2 = new this.createBox(100, 200, 300, 1000);
-    this.box3 = new this.createBox(100000, 2000000, 50000, 0.1);
+    this.box1 = new Box(10, 20, 30, 10);
+    this.box2 = new Box(100, 200, 300, 1000);
+    this.box3 = new Box(100000, 2000000, 50000, 0.1);
 
-    this.boxArray.push(new this.createBox(10, 110, 31, 100));
-    this.boxArray.push(new this.createBox(20, 120, 32, 101));
-    this.boxArray.push(new this.createBox(30, 130, 33, 102));
-    this.boxArray.push(new this.createBox(40, 140, 34, 103));
-    this.boxArray.push(new this.createBox(50, 150, 35, 104));
-    this.boxArray.push(new this.createBox(60, 160, 36, 105));
-    this.boxArray.push(new this.createBox(70, 170, 37, 106));
-    this.boxArray.push(new this.createBox(80, 180, 38, 107));
-    this.boxArray.push(new this.createBox(90, 190, 39, 108));
-    this.boxArray.push(new this.createBox(80, 200, 10, 50));
+    this.boxArray.push(new Box(10, 110, 31, 100));
+    this.boxArray.push(new Box(20, 120, 32, 101));
+    this.boxArray.push(new Box(30, 130, 33, 102));
+    this.boxArray.push(new Box(40, 140, 34, 103));
+    this.boxArray.push(new Box(50, 150, 35, 104));
+    this.boxArray.push(new Box(60, 160, 36, 105));
+    this.boxArray.push(new Box(70, 170, 37, 106));
+    this.boxArray.push(new Box(80, 180, 38, 107));
+    this.boxArray.push(new Box(90, 190, 39, 108));
+    this.boxArray.push(new Box(80, 200, 10, 50));
 
-    this.carsArray.push(new this.createCar(900));
-    this.carsArray.push(new this.createCar(930));
-    this.carsArray.push(new this.createCar(950));
-    this.carsArray.push(new this.createCar(1000));
-    this.carsArray.push(new this.createCar(1250));
+    this.carsArray.push(new Car(900));
+    this.carsArray.push(new Car(930));
+    this.carsArray.push(new Car(950));
+    this.carsArray.push(new Car(1000));
+    this.carsArray.push(new Car(1250));
   }
 };
 </script>

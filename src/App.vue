@@ -2,7 +2,6 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Logistic</router-link>
-      <!-- <router-link to="/about">Matrix</router-link> -->
     </div>
     <router-view />
   </div>
